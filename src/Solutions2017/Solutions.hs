@@ -64,3 +64,7 @@ goDir DDown n (x, y) = (x, y + n)
 
 day3part2 :: String -> String
 day3part2 = undefined
+
+{-move :: (Int, Int, Direction) -> Direction -> (Int, Int, Direction)
+mode (n, maxn, dir) moveDir = case dir of
+  Right -> -}

@@ -12,7 +12,7 @@ Run "stack run year day" to run the solving procedure for that year and day,
 ex. "stack run 2019 1" to solve the first day puzzles in 2019.
 
 Assuming the solutions can be found through the Solutions module(s), it will download and cache your input,
-display puzzle prompts (the coding task) and use the solutions to submit answers automatically.
+display puzzle prompts (problem statement) and use the solutions to submit answers automatically.
 Feel free to use the code to submit your own answers, but since this repo is meant to store my own answers, they will be included as _free samples_ (unless there are complaints). So you may want to liberally press delete in the src/ folder after cloning.
 
 You can use "undefined" solutions causing the program to <s>crash</s> _exit gracefully_ to incrementally solve a puzzle.
