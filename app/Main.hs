@@ -76,6 +76,7 @@ submitAndProcessResult aocOptions basePath year day input timeoutMus part = do
   else do
     putStrLn "No solution yet, calculating..."
     let output = fromMaybe (error "No solution") $ ($input) <$> solution year day part
+    -- TODO: As I feared, seems like the timeout is skipped thanks to lazy IO
     fromMaybe (error "No solution") <$> timeout timeoutMus (writeFile outputPath output)
     putStrLn "Calculated, submitting..."
     (response, result) <- runAoC' aocOptions (AoCSubmit aocDay part output)
