@@ -2,12 +2,15 @@ module Solutions2019.Solutions where
 
 import Data.List.Split
 import Data.List
+import Data.Foldable
+import Solutions2019.Intcode (runIntcode)
 
 solutions :: [(Integer, (String -> String, String -> String))]
 solutions = [ (1, (day1part1, day1part2)),
   (2, (day2part1, day2part2)),
   (3, (day3part1, day3part2)),
-  (4, (day4part1, day4part2))]
+  (4, (day4part1, day4part2)),
+  (5, (day5part1, day5part2))]
 
 day1part1 :: String -> String
 day1part1 = show . sum . map (fuelneed . (read :: String -> Int)) . lines
@@ -108,6 +111,15 @@ ascending (x:y:xs) = x <= y && ascending (y:xs)
   
 day4part2 :: String -> String
 day4part2 = show . length . filter (any $ (==2) . length) . map group . filter ascending . map toDigits . (\[x, y] -> [x .. y]) . map read . splitOn "-"
+
+diagnostic :: [Int] -> String -> String
+diagnostic input = show . last . toList . snd . runIntcode input . map read . splitOn ","
+
+day5part1 :: String -> String
+day5part1 = diagnostic [1]
+
+day5part2 :: String -> String
+day5part2 = diagnostic [5]
 
 dayxparty :: String -> String
 dayxparty = undefined

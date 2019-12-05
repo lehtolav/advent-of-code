@@ -44,6 +44,7 @@ dependencies:
 - containers -any
 - process -any
 - split -any
+- mtl -any
 
 library:
   source-dirs: src
