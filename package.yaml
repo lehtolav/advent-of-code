@@ -27,7 +27,7 @@ ghc-options:
   - -Wall
   - -Wcompat
   - -Wincomplete-record-updates
-  - -Wincomplete-uni-patterns
+  #- -Wincomplete-uni-patterns
   - -Wredundant-constraints
   - -fno-warn-partial-type-signatures
   - -fno-warn-name-shadowing
