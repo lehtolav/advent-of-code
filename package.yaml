@@ -45,6 +45,9 @@ dependencies:
 - process -any
 - split -any
 - mtl -any
+- bytestring-trie -any
+- utf8-string -any
+- comonad -any
 
 library:
   source-dirs: src

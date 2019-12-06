@@ -4,13 +4,22 @@ import Data.List.Split
 import Data.List
 import Data.Foldable
 import Solutions2019.Intcode (runIntcode)
+import Data.Tree
+import Control.Arrow
+import Data.Map (Map)
+import qualified Data.Map as Map
+import Data.Trie (Trie)
+import qualified Data.Trie as Trie
+import Data.ByteString.UTF8 (ByteString, fromString)
+import Data.Maybe
 
 solutions :: [(Integer, (String -> String, String -> String))]
 solutions = [ (1, (day1part1, day1part2)),
   (2, (day2part1, day2part2)),
   (3, (day3part1, day3part2)),
   (4, (day4part1, day4part2)),
-  (5, (day5part1, day5part2))]
+  (5, (day5part1, day5part2)),
+  (6, (day6part1, day6part2))]
 
 day1part1 :: String -> String
 day1part1 = show . sum . map (fuelneed . (read :: String -> Int)) . lines
@@ -120,6 +129,47 @@ day5part1 = diagnostic [1]
 
 day5part2 :: String -> String
 day5part2 = diagnostic [5]
+
+buildTreeTrie :: (a -> ByteString) -> [(a, a)] -> Trie (Tree a)
+buildTreeTrie convert edges = 
+  graph
+  where bsEdges = map (first convert) edges
+        nodeMap = Map.fromListWith (++) (map (second (:[])) bsEdges)
+        edgesFor label = nodeMap Map.! convert label
+        graph = foldr (insertToGraph . fst) Trie.empty edges
+        findOrDefault target = fromMaybe (Node target []) $ (`Trie.lookup` graph) $ convert target
+        buildNode label = Node label $ map findOrDefault (edgesFor label)
+        insertToGraph label = Trie.insert (convert label) (buildNode label)
+
+findRoot :: (Eq a) => Trie (Tree a) -> Tree a
+findRoot treeTrie = fromJust $ find nonReferred trees
+  where trees = Trie.elems treeTrie
+        referred = concatMap (map rootLabel . subForest) trees
+        nonReferred (Node x _) = x `notElem` referred
+
+childs :: Int -> Tree a -> Int
+childs depth (Node _ branches) = depth + sum (map (childs $ depth + 1) branches)
+
+day6part1 :: String -> String
+day6part1 = show . childs 0 . findRoot . buildTreeTrie fromString . map ((\[x, y] -> (x, y)) . splitOn ")") . lines
+
+pathTo :: (Eq a) => a -> Tree a -> [a]
+pathTo target tree =
+  if rootLabel tree == target
+  then [target]
+  else maybe [] (rootLabel tree:) $ (find (not . null) $ map (pathTo target) (subForest tree))
+
+pathDiffLen :: (Eq a) => a -> a -> Tree a -> Int
+pathDiffLen t1 t2 tree = length (removeTarget t1 dt1) + length (removeTarget t2 dt2)
+  where pt1 = pathTo t1 tree
+        pt2 = pathTo t2 tree
+        stripCommon (x:xs) (y:ys) = if y == x then stripCommon xs ys else (x:xs, y:ys)
+        stripCommon xs ys = (xs, ys)
+        (dt1, dt2) = stripCommon pt1 pt2
+        removeTarget target = filter (/=target)
+
+day6part2 :: String -> String
+day6part2 = show . pathDiffLen "YOU" "SAN" . findRoot . buildTreeTrie fromString . map ((\[x, y] -> (x, y)) . splitOn ")") . lines
 
 dayxparty :: String -> String
 dayxparty = undefined
