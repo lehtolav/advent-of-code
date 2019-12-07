@@ -12,6 +12,7 @@ import Data.Trie (Trie)
 import qualified Data.Trie as Trie
 import Data.ByteString.UTF8 (ByteString, fromString)
 import Data.Maybe
+import Control.Monad
 
 solutions :: [(Integer, (String -> String, String -> String))]
 solutions = [ (1, (day1part1, day1part2)),
@@ -19,7 +20,8 @@ solutions = [ (1, (day1part1, day1part2)),
   (3, (day3part1, day3part2)),
   (4, (day4part1, day4part2)),
   (5, (day5part1, day5part2)),
-  (6, (day6part1, day6part2))]
+  (6, (day6part1, day6part2)),
+  (7, (day7part1, day7part2))]
 
 day1part1 :: String -> String
 day1part1 = show . sum . map (fuelneed . (read :: String -> Int)) . lines
@@ -157,7 +159,7 @@ pathTo :: (Eq a) => a -> Tree a -> [a]
 pathTo target tree =
   if rootLabel tree == target
   then [target]
-  else maybe [] (rootLabel tree:) $ (find (not . null) $ map (pathTo target) (subForest tree))
+  else maybe [] (rootLabel tree:) $ find (not . null) (map (pathTo target) (subForest tree))
 
 pathDiffLen :: (Eq a) => a -> a -> Tree a -> Int
 pathDiffLen t1 t2 tree = length (removeTarget t1 dt1) + length (removeTarget t2 dt2)
@@ -171,5 +173,21 @@ pathDiffLen t1 t2 tree = length (removeTarget t1 dt1) + length (removeTarget t2 
 day6part2 :: String -> String
 day6part2 = show . pathDiffLen "YOU" "SAN" . findRoot . buildTreeTrie fromString . map ((\[x, y] -> (x, y)) . splitOn ")") . lines
 
+day7part1 :: String -> String
+day7part1 = show . maximum . concat . zipWith (flip ($)) (permutations [0..4]) . repeat . (\prg -> foldM (testAmp prg) 0) . map read . splitOn ","
+  where testAmp :: [Int] -> Int -> Int -> [Int]
+        testAmp program signal setting = toList . snd $ runIntcode [setting, signal] program
+
+circuit :: [Int] -> [Int] -> [Int]
+circuit program settings =
+  let output = 0 : pipeline output
+  in tail output
+  where amp signal setting = toList . snd $ runIntcode (setting:signal) program
+        pipeline :: [Int] -> [Int]
+        pipeline input = foldl amp input settings
+
+day7part2 :: String -> String
+day7part2 = show . maximum . map last . zipWith (flip ($)) (permutations [5..9]) . repeat . circuit . map read . splitOn ","
+        
 dayxparty :: String -> String
 dayxparty = undefined
